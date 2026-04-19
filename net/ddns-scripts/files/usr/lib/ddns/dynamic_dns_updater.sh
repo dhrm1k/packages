@@ -23,7 +23,7 @@ Usage:
 
 Parameters:
  -S SECTION          SECTION to start
-                     use either -N NETWORK or -S SECTION
+                     use either -n NETWORK or -S SECTION
 
  -h                  show this help and exit
  -V                  show version and exit
@@ -57,7 +57,16 @@ while getopts ":hv:dn:S:V" OPT; do
 done
 shift $((OPTIND - 1 ))	# OPTIND is 1 based
 
-[ -z "$SECTION_ID" ] && usage_err "option '-N' is missing"
+if [ -z "$SECTION_ID" ]; then
+	if [ $# -eq 2 ]; then
+		case "$2" in
+			[0-9]*)
+				usage_err "legacy syntax detected ('$1 $2'); use '-S $1 -v $2'"
+				;;
+		esac
+	fi
+	usage_err "option '-S' is missing"
+fi
 
 # set file names
 PIDFILE="$ddns_rundir/$SECTION_ID.pid"	# Process ID file
